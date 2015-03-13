@@ -1,0 +1,45 @@
+<!DOCTYPE HTML5>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Apollo</title>
+    <script src="js/gl-matrix.js"></script>
+    <script src="js/three.min.js"></script>
+    <script src="js/collisions.js"></script>
+    <script src="js/collider.js"></script>
+    <script src="js/physics.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/gameObject.js"></script>
+    <script src="js/Apollo/Input/inputManager.js"></script>
+    <script src="js/main.js"></script>
+    
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        attribute vec2 position;
+
+        uniform mat4 perspective;
+        uniform mat4 view;
+        uniform mat4 world;
+        void main() {
+                gl_Position = perspective * (view * ( world * vec4(position, 0, 1)));
+        }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        void main() {
+                gl_FragColor = vec4(0,1,0,1);  // green
+        }
+    </script>
+    
+    <style>
+        html, body{
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <canvas id="canvas" width="800" height="500">
+    </div>
+</body>
+</html>
