@@ -7,11 +7,15 @@
     <script src="js/collisions.js"></script>
     <script src="js/collider.js"></script>
     <script src="js/Apollo/Apollo.js"></script>
-    <script src="js/Apollo/Mesh.js"></script>
-    <script src="js/Apollo/CreateGeometry.js"></script>
-    <script src="js/Apollo/GameObject.js"></script>
+    <script src="js/Apollo/Core/Mesh.js"></script>
+    <script src="js/Apollo/Core/GameObject.js"></script>
+    <script src="js/Apollo/Core/Transform.js"></script>
+    <script src="js/Apollo/Math/Matrix4.js"></script>
+    <script src="js/Apollo/Math/Vector3.js"></script>
     <script src="js/Apollo/Input/inputManager.js"></script>
-    <script src="js/main.js"></script>
+    <script>
+        window.onload = initGraphics;
+    </script>
     
     <script id="vertex-shader" type="x-shader/x-vertex">
         attribute vec2 position;

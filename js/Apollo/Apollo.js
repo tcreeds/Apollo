@@ -9,7 +9,7 @@ var perspectiveMatrix = mat4.create();
 
 var APOLLO = {};
 
-function init(){
+function initGraphics(){
             
         var canvas = document.getElementById('canvas');
 
@@ -57,7 +57,7 @@ function drawScene(){
         mat4.translate(viewMatrix, viewMatrix, [0.0, 0.0, -5.0]);
         mat4.perspective(perspectiveMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
         
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, object.indexBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, object.mesh.indexBuffer);
         
         gl.vertexAttribPointer(gl.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
         
@@ -72,15 +72,15 @@ function update(){
         var state = input.getInputState();
         
         if (state.leftArrow){
-                object.position.x -= 0.1;
+                object.transform.Translate(-0.1, 0, 0);
         }
         if (state.rightArrow){
-                object.position.x += 0.1;
+                object.transform.Translate(0.1, 0, 0);
         }
 }
 
 function setUniformMatrices(){
-        gl.uniformMatrix4fv(shaderProgram.wmLocation, false, worldMatrix);
+        gl.uniformMatrix4fv(shaderProgram.wmLocation, false, object.transform.matrix.elements);           //give gameobject a transform, hook up matrix and write translate
         gl.uniformMatrix4fv(shaderProgram.vmLocation, false, viewMatrix);
         gl.uniformMatrix4fv(shaderProgram.pmLocation, false, perspectiveMatrix);
         
@@ -277,7 +277,7 @@ function makeObject(){
             16, 17, 18,     16, 18, 19,   // right
             20, 21, 22,     20, 22, 23    // left
         ];
-        
-        return new APOLLO.Mesh( { vertices: vertices, indices: indices } );
+        var mesh = new APOLLO.Mesh( { vertices: vertices, indices: indices } );
+        return new APOLLO.GameObject( mesh );
         
 }
