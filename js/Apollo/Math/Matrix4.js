@@ -65,6 +65,27 @@ APOLLO.Matrix4.prototype = {
         
         },
         
+        RotateAxisAngle: function( axis, angle ){
+                
+                var s = Math.sin( angle );
+                var c = Math.cos( angle );
+                var t = 1 - c;
+                var x = axis.x;
+                var y = axis.y;
+                var z = axis.z;
+                var tx = t * x;
+                var ty = t * y;
+                
+                //set 3x3 matrix with values
+                this.Set(
+                        tx * x + c, tx * y - s * z, tx * z + s * y, this.elements[12],
+			tx * y + s * z, ty * y + c, ty * z - s * x, this.elements[13],
+			tx * z - s * y, ty * z + s * x, t * z * z + c, this.elements[14],
+			0, 0, 0, 1
+                );
+        
+        },
+        
         SetTranslation: function( x, y, z ){
         
                 if ( arguments.length == 3){

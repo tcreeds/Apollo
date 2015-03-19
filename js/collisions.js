@@ -114,7 +114,7 @@ function testOBBs( a, b ){
                 }
         }
         
-        //get reference face of A (L), incident face (most parallel face on B), clip incident against side faces of reference,
+        //get reference face of A, incident face (most parallel face on B), clip incident against side faces of reference,
         //keep all points below reference face plane
          
         var collisionData = new CollisionData();
