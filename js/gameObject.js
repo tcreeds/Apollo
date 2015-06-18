@@ -6,7 +6,7 @@ function GameObject(mesh){
     this.rotationAxis = undefined;
     this.rotation = this.mesh.rotation;
     this.appliedForce = new THREE.Vector3();
-    this.inverseMass = 1;
+    this.inverseMass = 1/5;
 }
 
 function update(){
@@ -19,8 +19,11 @@ function update(){
             this.position.y += this.velocity.y;
             this.position.z += this.velocity.z;
     }
+    var axis = this.rotationAxis.clone();
+    axis.normalize();
+    this.mesh.rotateOnAxis(axis, this.rotationAxis.length());
     
-    this.mesh.rotateOnAxis(this.rotationAxis, this.rotationAxis.lengthManhattan() / 100);
+    this.rotationAxis.multiplyScalar( 0.99 );
    
     
     this.appliedForce.x = this.appliedForce.y = this.appliedForce.z = 0;
@@ -32,7 +35,9 @@ function setCollider(){
     var params = this.mesh.geometry.parameters;
     this.collider = new Collider(this.position, 
                         [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)],
-                        new THREE.Vector3(params.width/2, params.height/2, params.depth/2));   
+                        new THREE.Vector3(params.width/2, params.height/2, params.depth/2), 
+                        this.mesh.geometry.vertices,
+                        this.mesh.matrix        );   
 }
 
 function updateCollider(){

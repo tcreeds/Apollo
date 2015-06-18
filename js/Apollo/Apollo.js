@@ -49,6 +49,7 @@ function drawScene(){
 
         requestAnimationFrame(drawScene);
         
+        object.transform.UpdateMatrix();
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -68,15 +69,23 @@ function drawScene(){
 }
 
 function update(){
-
+    object.Update();
         var state = input.getInputState();
         
-        if (state.leftArrow){
+        if (state.leftArrow)
+                object.transform.RotateY(0.1);
+        if (state.rightArrow)
+                object.transform.RotateY(-0.1);
+        if (state.a){
                 object.transform.Translate(-0.1, 0, 0);
         }
-        if (state.rightArrow){
+        if (state.d){
                 object.transform.Translate(0.1, 0, 0);
         }
+        if (state.w)
+                object.transform.Translate(0, 0.1, 0);
+        if (state.s)
+                object.transform.Translate(0, -0.1, 0);
 }
 
 function setUniformMatrices(){

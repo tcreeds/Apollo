@@ -103,28 +103,129 @@ function testOBBs( a, b ){
         
         //collision, lets do this
         
-        var min = 100.0;
+        var min = 1.0;
         var index = 0;
+        var normal;
+        var planePoint = new THREE.Vector3();
+        var vertices;
+        var contactPoints = [];
         
         //calculates least separation
-        for (var i = 1; i < 15; i++){
+        for (var i = 1; i < 6; i++){
                 if (penetrations[i] < penetrations[index]){
                         index = i;
                         min = penetrations[i];
                 }
         }
         
-        //get reference face of A, incident face (most parallel face on B), clip incident against side faces of reference,
-        //keep all points below reference face plane
-         
+        //calculate normal and point of plane based on axis
+        //get points below reference face (inside of other collider)
+        if (index < 3){
+                
+                vertices = rotateVertices( b.vertices, b.transform );
+                testVertices( vertices, contactPoints, a, index );                        
+                
+        }
+        else{
+    
+                vertices = rotateVertices( a.vertices, a.transform );
+                testVertices( vertices, contactPoints, b, index );
+                
+        }
+        /*
+        else{
+                //var as = (Math.floor(i / 3) - 2) == 0 ? "x" : ((Math.floor(i / 3) - 2 == 1) ? "y" : "z");
+                //var bs = i % 3 == 0 ? "x" : (i % 3 == 1 ? "y" : "z"); 
+                normal = cross3( a.axes[Math.floor(i / 3) - 3], b.axes[i % 3] );
+                
+                //find point to represent reference plane
+        }*/
+        
+        //store collision data, return it
+        t = new THREE.Vector3();
+        t.subVectors( b.position, a.position );
         var collisionData = new CollisionData();
         collisionData.normal = t;
         collisionData.transform = R;
+        if (contactPoints.length > 0)
+                collisionData.point = contactPoints[0];
+        collisionData.penetration = min;
         
+        return collisionData;
+}
+
+function testVertices( verts, contactPoints, collider, index ){
+
+        var testPoint = new THREE.Vector3();
+        var normals = [];
+        var points = [];
+       
+        generatePlane(index % 3, collider, normals, points);
+        generatePlane((index + 1) % 3, collider, normals, points);
+        generatePlane((index + 2) % 3, collider, normals, points);
+        generatePlane((index + 1) % 3, collider, normals, points, true);
+        generatePlane((index + 2) % 3, collider, normals, points, true);        
         
-        return true;
+        //check each vertex against planes
+        for (var i = 0; i < verts.length; i++){
+                
+                var flag = true;
+                
+                //test vertex against each plane, break if outside
+                for (var j = 0; j < normals.length; j++){
+                        testPoint.subVectors( verts[i], points[j] );
+                        if (!(dot3( testPoint, normals[j] ) < 1)){
+                                flag = false;
+                                break;
+                        }
+                }
+        
+                //if vertex passes all plane checks, add to contact points
+                if (flag)
+                        contactPoints.push( verts[i] );
+        }
+}
+
+//creates plane from collider's axis
+function generatePlane( index, collider, normals, points, negate ){
+
+        var normal = collider.axes[index].clone();
+        if (index == 0)
+                normal.multiplyScalar( collider.halfWidths.x );
+        else if (index == 1)
+                normal.multiplyScalar( collider.halfWidths.y );
+        else if (index == 2)
+                normal.multiplyScalar( collider.halfWidths.z );
+        
+        if (negate)
+                normal.negate();
+        var point = new THREE.Vector3();
+        point.addVectors( collider.position, normal );
+        normal.normalize();
+        normals.push( normal );
+        points.push( point );
+}
+
+function rotateVertices( verts, matrix ){
+        var arr = new Array( verts.length );
+        
+        for (var i = 0; i < arr.length; i++){
+                arr[i] = verts[i].clone();
+                arr[i].applyMatrix4( matrix );
+        }
+        return arr;
 }
 
 function dot3( v1, v2 ){
         return  v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+
+function cross3( v1, v2 ){
+      
+	var x = v1.y * v2.z - v1.z * v2.y;
+	var y = v1.z * v2.x - v1.x * v2.z;
+	var z = v1.x * v2.y - v1.y * v2.x;
+        var vec = new THREE.Vector3;
+        vec.set( x, y, z );
+        return vec;
 }

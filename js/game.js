@@ -34,9 +34,9 @@ function initWebGL(){
     shapes.push(createGeometry(scene, "box"));
     shapes.push(createGeometry(scene, "box"));
     shapes.push(createGeometry(scene, "box"));
-    shapes[0].rotationAxis = new THREE.Vector3(1, 0, 0);
-    shapes[1].rotationAxis = new THREE.Vector3(0, 1, 0);
-    shapes[2].rotationAxis = new THREE.Vector3(0, 0, 1);
+    shapes[0].rotationAxis = new THREE.Vector3(0.05, 0, 0);
+    shapes[1].rotationAxis = new THREE.Vector3(0, 0.05, 0);
+    shapes[2].rotationAxis = new THREE.Vector3(0, 0, 0.05);
     shapes[0].setCollider();
     shapes[1].setCollider();
     shapes[2].setCollider();
@@ -80,15 +80,35 @@ function initWebGL(){
         
         for (var i = 0; i < shapes.length; i++){
             shapes[i].update();
-            if (shapes[i].position.x > 10 || shapes[i].position.x < -10)
+            if (shapes[i].position.x > 10){
+                shapes[i].position.setX(10);
                 shapes[i].velocity.x *= -1;
-            if (shapes[i].position.y > 20 || shapes[i].position.y < 0)
+            }
+            else if (shapes[i].position.x < -10){
+                shapes[i].position.setX(-10);
+                shapes[i].velocity.x *= -1;
+            }
+            else if (shapes[i].position.y > 20){
+                shapes[i].position.setY(20);
                 shapes[i].velocity.y *= -1;
-            if (shapes[i].position.z > 10 || shapes[i].position.z < -10)
+            }
+            if (shapes[i].position.y < 0){
+                shapes[i].position.setY(0);
+                shapes[i].velocity.y *= -1;
+            }
+            if (shapes[i].position.z > 10){
+                shapes[i].position.setZ(10);
                 shapes[i].velocity.z *= -1;
+            }
+            else if (shapes[i].position.z < -10){
+                shapes[i].position.setZ(-10);
+                shapes[i].velocity.z *= -1;
+            }
             for (var j = i + 1; j < shapes.length; j++){
                 if (j != i){
-                    if (testOBBs(shapes[i].collider, shapes[j].collider)){
+                    var data = testOBBs(shapes[i].collider, shapes[j].collider);
+                    if (data){
+                        resolveCollision(shapes[i], shapes[j], data);
                         shapes[i].mesh.material.color = red;
                         shapes[j].mesh.material.color = red;
                     }

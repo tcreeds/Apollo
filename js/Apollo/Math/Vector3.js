@@ -63,6 +63,12 @@ APOLLO.Vector3.prototype = {
                 
         },
         
+        AddVector: function( x, y, z ){
+            this.x += x;
+            this.y += y;
+            this.z += z;
+        },
+    
         Dot: function( vec ){
                 
                 return this.x * vec.x + this.y * vec.y + this.z * vec.z;
