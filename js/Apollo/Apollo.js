@@ -6,11 +6,23 @@ var indexBuffer;
 var worldMatrix = mat4.create();
 var viewMatrix = mat4.create();
 var perspectiveMatrix = mat4.create();
+var testMat = mat4.create();
 
 var APOLLO = {};
+var socket;
 
 function initGraphics(){
             
+        /*socket = io.connect();
+        socket.on("new user", function(data){
+           console.log("new user " +  data.id);
+        });
+        socket.on("game update", function(data){
+            console.log("game update"); 
+            
+        });*/
+        
+    
         var canvas = document.getElementById('canvas');
 
         gl = initGL();
@@ -38,7 +50,10 @@ function initGraphics(){
          
         object = makeObject();
         //initBuffers();
+    
          
+        APOLLO.mainCamera = new APOLLO.Camera(60, canvas.width/canvas.height, 1, 1000);
+        APOLLO.mainCamera.update();
          
         drawScene();
         setInterval(update, 15);
@@ -53,7 +68,7 @@ function drawScene(){
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        mat4.identity(object.transform);
+        
         mat4.identity(viewMatrix);
         mat4.translate(viewMatrix, viewMatrix, [0.0, 0.0, -5.0]);
         mat4.perspective(perspectiveMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
@@ -72,10 +87,17 @@ function update(){
     object.Update();
         var state = input.getInputState();
         
-        if (state.leftArrow)
+        if (state.space){
+            socket.emit("start game");   
+        }
+        if (state.leftArrow){
                 object.transform.RotateY(0.1);
-        if (state.rightArrow)
+                mat4.rotateY(testMat, testMat, 0.1)
+        }
+        if (state.rightArrow){
                 object.transform.RotateY(-0.1);
+                mat4.rotateY(testMat, testMat, -0.1)
+        }
         if (state.a){
                 object.transform.Translate(-0.1, 0, 0);
         }
@@ -89,9 +111,10 @@ function update(){
 }
 
 function setUniformMatrices(){
+        
         gl.uniformMatrix4fv(shaderProgram.wmLocation, false, object.transform.matrix.elements);           //give gameobject a transform, hook up matrix and write translate
-        gl.uniformMatrix4fv(shaderProgram.vmLocation, false, viewMatrix);
-        gl.uniformMatrix4fv(shaderProgram.pmLocation, false, perspectiveMatrix);
+        gl.uniformMatrix4fv(shaderProgram.vmLocation, false, viewMatrix/*APOLLO.mainCamera.viewMatrix.elements*/);
+        gl.uniformMatrix4fv(shaderProgram.pmLocation, false, perspectiveMatrix/*APOLLO.mainCamera.projectionMatrix.elements*/);
         
 }
 
@@ -194,31 +217,31 @@ function initBuffers(){
              1.0, -1.0,  1.0,
              1.0,  1.0,  1.0,
             -1.0,  1.0,  1.0,
-            
+
             // Back face
             -1.0, -1.0, -1.0,
             -1.0,  1.0, -1.0,
              1.0,  1.0, -1.0,
              1.0, -1.0, -1.0,
-            
+
             // Top face
             -1.0,  1.0, -1.0,
             -1.0,  1.0,  1.0,
              1.0,  1.0,  1.0,
              1.0,  1.0, -1.0,
-            
+
             // Bottom face
             -1.0, -1.0, -1.0,
              1.0, -1.0, -1.0,
              1.0, -1.0,  1.0,
             -1.0, -1.0,  1.0,
-            
+
             // Right face
              1.0, -1.0, -1.0,
              1.0,  1.0, -1.0,
              1.0,  1.0,  1.0,
              1.0, -1.0,  1.0,
-            
+
             // Left face
             -1.0, -1.0, -1.0,
             -1.0, -1.0,  1.0,

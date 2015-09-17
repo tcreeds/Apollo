@@ -17,10 +17,10 @@ APOLLO.Matrix4.prototype = {
                 if ( arguments.length == 16 ){
                         var e = this.elements;
                         
-                        e[ 0 ] = m11; e[ 4 ] = m21; e[ 8 ] = m31; e[ 12 ] = m41;
-                        e[ 1 ] = m21; e[ 5 ] = m22; e[ 9 ] = m32; e[ 13 ] = m42;
-                        e[ 2 ] = m31; e[ 6 ] = m23; e[ 10 ] = m33; e[ 14 ] = m43;
-                        e[ 3 ] = m14; e[ 7 ] = m24; e[ 11 ] = m34; e[ 15 ] = m44;
+                        e[ 0 ] = m11; e[ 1 ] = m12; e[ 2 ] = m13; e[ 3 ] = m14;
+                        e[ 4 ] = m21; e[ 5 ] = m22; e[ 6 ] = m23; e[ 7 ] = m24;
+                        e[ 8 ] = m31; e[ 9 ] = m32; e[ 10 ] = m33; e[ 11 ] = m34;
+                        e[ 12 ] = m41; e[ 13 ] = m42; e[ 14 ] = m43; e[ 15 ] = m44;
                         
                 }
                 else{
@@ -64,25 +64,49 @@ APOLLO.Matrix4.prototype = {
                 return this;                      
         
         },
+    
+        Rotate: function(x, y, z){
+            
+            
+                
+            return this;
+        },
+    
+        RotateX: function(x){
+            return this;
+        },
+    
+        RotateY: function(y){
+            
+            return this;
+        },
+    
+        RotateZ: function(z){
+            
+            
+            return this;
+        },
         
         RotateAxisAngle: function( axis, angle ){
                 
                 var s = Math.sin( angle );
                 var c = Math.cos( angle );
                 var t = 1 - c;
-                var x = axis.x;
-                var y = axis.y;
-                var z = axis.z;
+                var mag = Math.abs(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z), 
+                mag = 1 / mag;
+                var x = axis.x * mag;
+                var y = axis.y * mag;
+                var z = axis.z * mag;
                 var tx = t * x;
                 var ty = t * y;
                 
                 
                 //set 3x3 matrix with values
                 var rm = [
-                        tx * x + c, tx * y - s * z, tx * z + s * y, 0,
-			tx * y + s * z, ty * y + c, ty * z - s * x, 0,
-			tx * z - s * y, ty * z + s * x, t * z * z + c, 0,
-			this.elements[12], this.elements[13], this.elements[14], 1
+                        tx * x + c,         tx * y + s * z,     tx * z - s * y,    0,
+                        tx * y - s * z,     ty * y + c,         ty * z + s * x,    0,
+                        tx * z + s * y,     ty * z - s * x,     t * z * z + c,     0,
+                        0/*this.elements[12]*/,  0/*this.elements[13]*/,  0/*this.elements[14]*/, 1
                 ];
                 
                 this.MultiplyMatrix4(rm);
@@ -119,7 +143,7 @@ APOLLO.Matrix4.prototype = {
                 
                 var rot = new Float32Array(16);
                 
-                rot[0] = 
+                /*rot[0] = 
                 rot[1] = 
                 rot[2] = 
                 
@@ -139,7 +163,7 @@ APOLLO.Matrix4.prototype = {
                 rot[3] = 
                 rot[7] = 
                 rot[11] = 
-                rot[15] = 
+                rot[15] = */
 
                 this.Set.apply(this, rot);
         },
@@ -168,11 +192,10 @@ APOLLO.Matrix4.prototype = {
             
         },
     
-        MakeTranslation: function( x, y, z ){
-           
-            var mat = new APOLLO.Matrix4();
-            mat.SetTranslation( x, y, z );
-            return mat;
+        MakeTranslation: function( out, x, y, z ){
+            if (!out) out = new APOLLO.Matrix4();
+            out.SetTranslation( x, y, z );
+            return out;
         },
     
         MakeScale: function(){

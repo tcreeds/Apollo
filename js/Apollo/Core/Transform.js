@@ -49,7 +49,8 @@ APOLLO.Transform.prototype = {
         },
         
         UpdateMatrix: function(){
-            this.matrix = this.matrix.MakeTranslation( this.position.x, this.position.y, this.position.z );
+            this.matrix.Identity()
+            this.matrix.MakeTranslation( this.matrix, this.position.x, this.position.y, this.position.z );
             this.matrix.MultiplyMatrix4( this.rotationMatrix );       
             
         }
