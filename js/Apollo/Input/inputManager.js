@@ -57,6 +57,10 @@ function onKey(event, state){
             break;
         case 68: this.inputState.d = state;
             break;
+        case 69: this.inputState.e = state;
+            break;
+        case 70: this.inputState.f = state;
+            break;
         case 87: this.inputState.w = state;
             break;
         case 83: this.inputState.s = state;

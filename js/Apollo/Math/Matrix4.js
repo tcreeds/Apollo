@@ -41,6 +41,29 @@ APOLLO.Matrix4.prototype = {
                 
                 return this;
         },
+    
+        Clone: function(out){
+            out = out || new APOLLO.Matrix4();
+            var t = this.elements, o = out.elements;
+            o[0] = t[0];
+            o[1] = t[1];
+            o[2] = t[2];
+            o[3] = t[3];
+            o[4] = t[4];
+            o[5] = t[5];
+            o[6] = t[6];
+            o[7] = t[7];
+            o[8] = t[8];
+            o[9] = t[9];
+            o[10] = t[10];
+            o[11] = t[11];
+            o[12] = t[12];
+            o[13] = t[13];
+            o[14] = t[14];
+            o[15] = t[15];
+            return out;
+            
+        },
         
         Translate: function( x, y, z ){
         
@@ -67,23 +90,58 @@ APOLLO.Matrix4.prototype = {
     
         Rotate: function(x, y, z){
             
-            
+            if (x)
+                this.RotateX(x);
+            if (y)
+                this.RotateY(y)
+            if (z)
+                this.RotateZ(z);
                 
             return this;
         },
     
         RotateX: function(x){
+            if (!x)
+                return this;
+            var c = Math.cos(x);
+            var s = Math.sin(x);
+            var m = new Float32Array( [ 
+                1,  0,  0,  0,
+                0,  c,  s,  0,
+                0,  -s,  c,  0,
+                0,  0,  0,  1
+            ]);
+            this.MultiplyMatrix4(m);
             return this;
         },
     
         RotateY: function(y){
-            
+            if (!y)
+                return this;
+            var c = Math.cos(y);
+            var s = Math.sin(y);
+            var m = new Float32Array( [ 
+                c,  0,  -s,  0,
+                0,  1,  0,  0,
+                s,  0,  c,  0,
+                0,  0,  0,  1
+            ]);
+            this.MultiplyMatrix4(m);
             return this;
         },
     
         RotateZ: function(z){
-            
-            
+            if (!z)
+                return this;
+            var c = Math.cos(z);
+            var s = Math.sin(z);
+            var m = new Float32Array( [ 
+                c,  s,  0,  0,
+                -s, c,  0,  0,
+                0,  0,  1,  0,
+                0,  0,  0,  1
+            ]);
+            this.MultiplyMatrix4(m);
             return this;
         },
         
@@ -111,6 +169,22 @@ APOLLO.Matrix4.prototype = {
                 
                 this.MultiplyMatrix4(rm);
         
+        },
+    
+        Scale: function(x, y, z){
+            var s = new APOLLO.Matrix4();
+            x = x !== null && x !== undefined ? x : 1;
+            y = y !== null && y !== undefined ? y : 1;
+            z = z !== null && z !== undefined ? z : 1;
+            s.Set(
+                x, 0, 0, 0,
+                0, y, 0, 0,
+                0, 0, z, 0,
+                0, 0, 0, 1
+            );
+            this.MultiplyMatrix4(s);
+            return this;
+                
         },
         
         SetTranslation: function( x, y, z ){

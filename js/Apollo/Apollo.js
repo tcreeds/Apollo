@@ -6,7 +6,6 @@ var indexBuffer;
 var worldMatrix = mat4.create();
 var viewMatrix = mat4.create();
 var perspectiveMatrix = mat4.create();
-var testMat = mat4.create();
 
 var APOLLO = {};
 var socket;
@@ -49,11 +48,14 @@ function initGraphics(){
         initShaders();
          
         object = makeObject();
+        object2 = makeObject();
+        object2.transform.Scale(5, 0.1, 5);
         //initBuffers();
     
          
-        APOLLO.mainCamera = new APOLLO.Camera(60, canvas.width/canvas.height, 1, 1000);
+        APOLLO.mainCamera = new APOLLO.Camera(Math.PI/3.5, canvas.width/canvas.height, 1, 100);
         APOLLO.mainCamera.update();
+        APOLLO.mainCamera.lookAt({ x: 0, y: 0, z: 0 });
          
         drawScene();
         setInterval(update, 15);
@@ -63,58 +65,75 @@ function initGraphics(){
 function drawScene(){
 
         requestAnimationFrame(drawScene);
-        
+        APOLLO.mainCamera.update();
         object.transform.UpdateMatrix();
+        object2.transform.UpdateMatrix();
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         
-        mat4.identity(viewMatrix);
+        /*mat4.identity(viewMatrix);
         mat4.translate(viewMatrix, viewMatrix, [0.0, 0.0, -5.0]);
-        mat4.perspective(perspectiveMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+        mat4.perspective(perspectiveMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);*/
+        
+    
         
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, object.mesh.indexBuffer);
-        
         gl.vertexAttribPointer(gl.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-        
-        setUniformMatrices();
-        
+        setUniformMatrices(object, APOLLO.mainCamera);
+        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+    
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, object2.mesh.indexBuffer);
+        gl.vertexAttribPointer(gl.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+        setUniformMatrices(object2, APOLLO.mainCamera);
         gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
         
 }
 
 function update(){
     object.Update();
+    object2.Update();
         var state = input.getInputState();
         
+        if (state.f){
+            APOLLO.mainCamera.follow(object);   
+        }
+        if (state.r){
+            APOLLO.mainCamera.freeRoam();   
+        }
         if (state.space){
             socket.emit("start game");   
         }
         if (state.leftArrow){
                 object.transform.RotateY(0.1);
-                mat4.rotateY(testMat, testMat, 0.1)
         }
         if (state.rightArrow){
                 object.transform.RotateY(-0.1);
-                mat4.rotateY(testMat, testMat, -0.1)
+        }
+        if (state.upArrow){
+               APOLLO.mainCamera.Move(0, 0, 1);
+        }
+        if (state.downArrow){
+                APOLLO.mainCamera.Move(0, 0, -1);
         }
         if (state.a){
-                object.transform.Translate(-0.1, 0, 0);
+                object.transform.Translate(object.transform.right.x/10, object.transform.right.y/10, object.transform.right.z/10);
         }
         if (state.d){
-                object.transform.Translate(0.1, 0, 0);
+                object.transform.Translate(object.transform.right.x/-10, object.transform.right.y/-10, object.transform.right.z/-10);
         }
         if (state.w)
-                object.transform.Translate(0, 0.1, 0);
+                object.transform.Translate(object.transform.forward.x/10, object.transform.forward.y/10, object.transform.forward.z/10);
         if (state.s)
-                object.transform.Translate(0, -0.1, 0);
+                object.transform.Translate(object.transform.forward.x/-10, object.transform.forward.y/-10, object.transform.forward.z/-10);
 }
 
-function setUniformMatrices(){
+function setUniformMatrices(obj, camera){
         
-        gl.uniformMatrix4fv(shaderProgram.wmLocation, false, object.transform.matrix.elements);           //give gameobject a transform, hook up matrix and write translate
-        gl.uniformMatrix4fv(shaderProgram.vmLocation, false, viewMatrix/*APOLLO.mainCamera.viewMatrix.elements*/);
-        gl.uniformMatrix4fv(shaderProgram.pmLocation, false, perspectiveMatrix/*APOLLO.mainCamera.projectionMatrix.elements*/);
+        gl.uniformMatrix4fv(shaderProgram.wmLocation, false, obj.transform.matrix.elements);           //give gameobject a transform, hook up matrix and write translate
+        //console.log(APOLLO.mainCamera.viewMatrix.elements);
+        gl.uniformMatrix4fv(shaderProgram.vmLocation, false, camera.viewMatrix.elements);
+        gl.uniformMatrix4fv(shaderProgram.pmLocation, false, camera.projectionMatrix.elements);
         
 }
 

@@ -17,7 +17,7 @@ app.get('/', function(request, response){
 });
 
 http.listen("3000", function(){
-    console.log("server started");
+    console.log("server started on port 3000");
 });
 
 io.on("connection", function(socket){
@@ -26,9 +26,12 @@ io.on("connection", function(socket){
     
     users.push(user);
     console.log("new user");
-    game.onPlayerConnected(user);
+    
+    game.userConnected(user);
+    
     socket.on("start game", startGame);
     socket.on("disconnect", userDisconnected);
+    socket.on("game update", gameUpdate); 
     
     io.emit("new user", { id: user.id });
 });
@@ -36,6 +39,8 @@ io.on("connection", function(socket){
 function userDisconnected(user){
     console.log("user disconnected");
     var id = user.id;
+    game.userDisconnected(user.id);
+    
     for (var i = 0; i < users.length; i++){
         if (users[i] == user)
             delete users[i];
@@ -55,29 +60,19 @@ function startGame(){
 
 function updateClients(){
     
-    var gameData = compileGameData();
+    var gameData = game.sendUpdate();
     
     io.emit("game update", gameData);
     
     
 };
 
+function gameUpdate(data){
+    game.receiveUpdate(data);  
+};
+
 function compileGameData(){
     
-    var data = {};
-    data.timestamp = Date.now();
-    data.players = [];
-    
-    for (var i = 0; i < users.length; i++){
-        data.players.push({
-            id: users[i].id,
-            x: users[i].x,
-            y: users[i].y,
-            z: users[i].z
-            
-        });
-    }
-    
-    return data;
+   
 };
 
