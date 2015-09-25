@@ -77,6 +77,9 @@ APOLLO.Camera.prototype = {
         e[13] = -yaxis.Dot(position);
         e[14] = -zaxis.Dot(position);
         e[15] = 1;
+        
+        this.los = zaxis;
+        
         return this.viewMatrix.elements;
         
     },
@@ -95,9 +98,9 @@ APOLLO.Camera.prototype = {
             this.position.Sub(this.target.forward.x * 5, -4, this.target.forward.z * 5);
             this.makeLookAt();
         }
-        else{
+        /*else{
             this.makeLookTo();   
-        }
+        }*/
         
         this.makePerspective();
         //this.VPMatrix = this.makeLookTo().Clone().MultiplyMatrix4(this.makePerspective());
