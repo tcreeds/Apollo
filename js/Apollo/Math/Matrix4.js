@@ -281,3 +281,24 @@ APOLLO.Matrix4.prototype = {
         
 
 }
+
+Object.defineProperties(APOLLO.Matrix4,
+    {
+        "0 ": { get: function(){ return this.elements[0]; } },  
+        "1 ": { get: function(){ return this.elements[1]; } },  
+        "2 ": { get: function(){ return this.elements[2]; } },  
+        "3 ": { get: function(){ return this.elements[3]; } },  
+        "4 ": { get: function(){ return this.elements[4]; } },  
+        "5 ": { get: function(){ return this.elements[5]; } },  
+        "6 ": { get: function(){ return this.elements[6]; } },  
+        "7 ": { get: function(){ return this.elements[7]; } },  
+        "8 ": { get: function(){ return this.elements[8]; } },  
+        "9 ": { get: function(){ return this.elements[9]; } },  
+        "10": { get: function(){ return this.elements[10]; } },  
+        "11": { get: function(){ return this.elements[11]; } },  
+        "12": { get: function(){ return this.elements[12]; } },  
+        "13": { get: function(){ return this.elements[13]; } },  
+        "14": { get: function(){ return this.elements[14]; } },  
+        "15": { get: function(){ return this.elements[15]; } },  
+    }
+);

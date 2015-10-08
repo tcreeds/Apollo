@@ -3,7 +3,7 @@ var Player = require('./Player.js');
 var Game = function(){
     this.running = false;
     this.users = {};
-    this.players = {};
+    this.players = [];
     this.numPlayers = 0;
 };
 
@@ -14,14 +14,17 @@ Game.prototype = {
     },
     
     playerConnected: function(player){
-        this.players[player.id] = new Player(player); 
+        this.players.push(new Player(player)); 
         this.numPlayers++;
     },
     
     playerDisconnected: function(id){
-        if (this.players[id] !== null && this.players[id] !== undefined){
-            this.numPlayers --;
-            delete this.players[id];
+        for (var i = 0; i < this.players.length; i++){
+            if (this.players[i].id === id){
+                this.players.splice(i, 1);
+                this.numPlayers--;
+                break;
+            }
         }
     },
     
@@ -30,24 +33,30 @@ Game.prototype = {
         data.timestamp = Date.now();
         data.players = [];
 
-        for (var player in this.players){
-            data.players.push({
-                id: player.id,
-                x: player.x,
-                y: player.y,
-                z: player.z
+        for (var i = 0; i < this.players.length; i++){
+            var obj = {
+                id: this.players[i].id,
+                x: this.players[i].x,
+                y: this.players[i].y,
+                z: this.players[i].z
 
-            });
+            }
+            data.players.push(obj);
+            console.log(obj);
         }
-
         return data;
     },
     
-    userUpdate: function(data){
-        var player = this.players[data.id];
-        player.x = data.x;
-        player.y = data.y;
-        player.z = data.z;
+    receiveUpdate: function(data){
+       for (var i = 0; i < this.players.length; i++){
+            if (this.players[i].id === data.id){
+                this.players[i].x = data.x;
+                this.players[i].y = data.y;
+                this.players[i].z = data.z;
+                break;
+            }
+        }
+        
     }
     
 };

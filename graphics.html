@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>Apollo</title>
     <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.3.js"></script>
     <script src="js/gl-matrix.js"></script>
     <script src="js/collisions.js"></script>
     <script src="js/collider.js"></script>
@@ -15,21 +16,26 @@
     <script src="js/Apollo/Math/Vector3.js"></script>
     <script src="js/Apollo/Core/Transform.js"></script>
     <script src="js/Apollo/Input/inputManager.js"></script>
+    <script src="js/Apollo/Loaders/OBJLoader.js"></script>
     <script>
         window.onload = initGraphics;
     </script>
     
     <script id="vertex-shader" type="x-shader/x-vertex">
         attribute vec3 position;
+        attribute vec2 uv;
+        attribute vec3 normal;
         
         varying vec3 N;
-        varying vec3 pos;
+        varying vec2 texCoords;
 
         uniform mat4 perspective;
         uniform mat4 view;
         uniform mat4 world;
         void main() {
+                texCoords = uv;
                 N = normalize(mat3(world) * position);
+                //N = normal;
                 gl_Position = perspective * (view * ( world * vec4(position, 1)));
         }
     </script>
@@ -38,6 +44,7 @@
         precision mediump float;
         
         varying vec3 N;
+        varying vec2 texCoords;
         
         void main() {
             
