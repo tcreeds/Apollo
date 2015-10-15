@@ -26,35 +26,35 @@
         attribute vec2 uv;
         attribute vec3 normal;
         
-        varying vec3 N;
+        varying vec3 Norm;
         varying vec2 texCoords;
 
         uniform mat4 perspective;
         uniform mat4 view;
         uniform mat4 world;
         void main() {
-                texCoords = uv;
-                N = normalize(mat3(world) * position);
-                //N = normal;
-                gl_Position = perspective * (view * ( world * vec4(position, 1)));
+            texCoords = uv;
+            Norm = normal;
+            gl_Position = perspective * (view * ( world * vec4(position, 1)));
         }
     </script>
 
     <script id="fragment-shader" type="x-shader/x-fragment">
         precision mediump float;
         
-        varying vec3 N;
+        varying vec3 Norm;
         varying vec2 texCoords;
+        uniform sampler2D sampler;
         
         void main() {
             
             vec3 dirLight = normalize(vec3(-1, -1, 0));
             
-            float angle = max(dot(N, -dirLight), 0.0);
+            float angle = max(dot(Norm, -dirLight), 0.0);
             
-            vec4 c = vec4(0, 1, 0, 1);
+            vec4 c = texture2D(sampler, vec2(texCoords.x, texCoords.y));
             
-            gl_FragColor = angle * c + vec4(0.1, 0.1, 0.1, 1);
+            gl_FragColor = c * angle + vec4(0.1, 0.1, 0.1, 1);
         }
     </script>
     

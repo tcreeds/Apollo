@@ -28,8 +28,8 @@ APOLLO.Mesh.prototype = {
         APOLLO.gl.bindBuffer(APOLLO.gl.ARRAY_BUFFER, this.normalBuffer);
         APOLLO.gl.bufferData(APOLLO.gl.ARRAY_BUFFER, this.normals, gl.DYNAMIC_DRAW);
         
-        //APOLLO.gl.bindBuffer(APOLLO.gl.ARRAY_BUFFER, this.uvBuffer);
-        //APOLLO.gl.bufferData(APOLLO.gl.ARRAY_BUFFER, this.uvs, gl.STATIC_DRAW);
+        APOLLO.gl.bindBuffer(APOLLO.gl.ARRAY_BUFFER, this.uvBuffer);
+        APOLLO.gl.bufferData(APOLLO.gl.ARRAY_BUFFER, this.uvs, gl.STATIC_DRAW);
         
         
         //APOLLO.gl.vertexAttribPointer(APOLLO.gl.vertexNormalAttribute, 3, APOLLO.gl.FLOAT, false, stride, 5 * size);
@@ -41,8 +41,8 @@ APOLLO.Mesh.prototype = {
         APOLLO.gl.vertexAttribPointer(APOLLO.gl.vertexPositionAttribute, 3, APOLLO.gl.FLOAT, false, 0, 0);
         APOLLO.gl.bindBuffer(APOLLO.gl.ARRAY_BUFFER, this.normalBuffer); 
         APOLLO.gl.vertexAttribPointer(APOLLO.gl.vertexNormalAttribute, 3, APOLLO.gl.FLOAT, false, 0, 0);
-        //APOLLO.gl.bindBuffer(APOLLO.gl.ARRAY_BUFFER, this.uvBuffer); 
-        //APOLLO.gl.vertexAttribPointer(APOLLO.gl.vertexTextureAttribute, 2, APOLLO.gl.FLOAT, false, 0, 0)
+        APOLLO.gl.bindBuffer(APOLLO.gl.ARRAY_BUFFER, this.uvBuffer); 
+        APOLLO.gl.vertexAttribPointer(APOLLO.gl.vertexTextureAttribute, 2, APOLLO.gl.FLOAT, false, 0, 0)
         
     }
     

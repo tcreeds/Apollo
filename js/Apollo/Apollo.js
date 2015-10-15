@@ -218,13 +218,13 @@ function initShaders(){
     gl.useProgram(shaderProgram);
 
     //enable vertex array
-    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "position");
-    shaderProgram.vertexTextureAttribute = gl.getAttribLocation(shaderProgram, "uv");
-    shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "normal");
+    gl.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "position");
+    gl.vertexTextureAttribute = gl.getAttribLocation(shaderProgram, "uv");
+    gl.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "normal");
     
-    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-    //gl.enableVertexAttribArray(shaderProgram.vertexTextureAttribute);
-    //gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
+    gl.enableVertexAttribArray(gl.vertexPositionAttribute);
+    gl.enableVertexAttribArray(gl.vertexTextureAttribute);
+    gl.enableVertexAttribArray(gl.vertexNormalAttribute);
 
     shaderProgram.wmLocation = gl.getUniformLocation(shaderProgram, "world");
     shaderProgram.vmLocation = gl.getUniformLocation(shaderProgram, "view");

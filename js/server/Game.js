@@ -42,7 +42,7 @@ Game.prototype = {
 
             }
             data.players.push(obj);
-            console.log(obj);
+            
         }
         return data;
     },
