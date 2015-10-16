@@ -1,27 +1,52 @@
-APOLLO.OBJLoader = function( filepath ) {
-    
-    
-    
-}
 
-APOLLO.OBJLoader.prototype = {
+APOLLO.load = {
     
-    load: function(path, name){
-        var that = this;
+    loadCounter: 0,
+    
+    loadInitialized: function(){
+        this.loadCounter++;   
+    },
+    
+    loadComplete: function(){
+        this.loadCounter --;
+        if (this.loadCounter == 0)
+            APOLLO.loaded();
+    },
+    
+    textureLoadComplete: function(texture, image, name){
+        APOLLO.gl.bindTexture(APOLLO.gl.TEXTURE_2D, texture);
+        APOLLO.gl.texImage2D(APOLLO.gl.TEXTURE_2D, 0, APOLLO.gl.RGBA, APOLLO.gl.RGBA, APOLLO.gl.UNSIGNED_BYTE, image);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        APOLLO.gl.bindTexture(gl.TEXTURE_2D, null);
         
+        APOLLO.Resources.Textures[name] = texture;
+        APOLLO.load.loadComplete();
+    },
+    
+    texture: function(path, name){
+        APOLLO.load.loadInitialized();
+        var tex = APOLLO.gl.createTexture();
+        var image = new Image();
+        image.onload = function(){ APOLLO.load.textureLoadComplete(tex, image, name); };
+        image.src = path;
+    },
+    
+    obj: function(path, name){
+         APOLLO.load.loadInitialized();
+
         $.ajax( {
             url: path,
             dataType: "text"
         }).success(function(data){
-            that.processData(data, name);  
+            APOLLO.load.objLoadComplete(data, name);  
         }).fail(function(){
             console.log("Could not load OBJ file " + path);  
         });  
     },
     
-    processData: function(data, name){
-        //console.log(data);   
-        
+    objLoadComplete: function(data, name){
         var str = data.split("\n");
         var positions = [];
         var normals = [];
@@ -86,12 +111,13 @@ APOLLO.OBJLoader.prototype = {
         var vertexData = {
             positions: vPositions,
             vertexCount: vertexCount,
-            normals: vPositions,
+            normals: vNormals,
             uvs: vUvs
         };
         APOLLO.Resources.Meshes[name] = vertexData;
-        APOLLO.loaded();
+        APOLLO.load.loadComplete();   
     }
+    
     
     
 }

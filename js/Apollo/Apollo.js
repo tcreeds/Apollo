@@ -10,6 +10,7 @@ var perspectiveMatrix = mat4.create();
 var APOLLO = {};
 var socket;
 var players = [];
+var gameObjects = [];
 var player;
 
 function initGraphics(){
@@ -21,7 +22,7 @@ function initGraphics(){
 
         gl = initGL();
         APOLLO.gl = gl;
-        APOLLO.Resources = { Meshes: {} };
+        APOLLO.Resources = { Meshes: {}, Textures: {} };
         input = InputManager(canvas);
         if (gl) {
             
@@ -42,10 +43,13 @@ function initGraphics(){
         }
     
         initShaders();
-    
+        
         APOLLO.loaded = start;
-        var objLoader = new APOLLO.OBJLoader();
-        objLoader.load("./Box.obj", "box");
+    
+        APOLLO.load.obj("./Box.obj", "box");
+        APOLLO.load.obj("./Plane.obj", "plane");
+        APOLLO.load.texture("./crate.jpg", "box");
+        APOLLO.load.texture("./grass.png", "grass");
     
         
             
@@ -69,9 +73,12 @@ function start(){
     });
     socket.on("connection info", function(data){
         console.log("connection confimed, id is " + data.id);
-        player = new APOLLO.GameObject(new APOLLO.Mesh( APOLLO.Resources.Meshes["box"] ));
+        var mesh = new APOLLO.Mesh(APOLLO.Resources.Meshes["box"]);
+        mesh.texture = APOLLO.Resources.Textures["box"];
+        player = new APOLLO.GameObject(mesh);
         player.id = data.id;
         players.push(player);
+        gameObjects.push(player);
         for (var i = 0; i < data.users.length; i++)
             addPlayer(data.users[i]);
     });
@@ -86,8 +93,11 @@ function start(){
         }
     });
     
-    
-
+    var mesh = new APOLLO.Mesh(APOLLO.Resources.Meshes["plane"]);
+    mesh.texture = APOLLO.Resources.Textures["grass"];
+    var ground = new APOLLO.GameObject(mesh);
+    ground.transform.Scale(20, 20, 20);
+    gameObjects.push(ground);
 
     APOLLO.mainCamera = new APOLLO.Camera(Math.PI/3.5, canvas.width/canvas.height, 1, 100);
     APOLLO.mainCamera.update();
@@ -98,9 +108,12 @@ function start(){
 }
 
 function addPlayer(data){
-    var newPlayer = new APOLLO.GameObject(new APOLLO.Mesh( APOLLO.Resources.Meshes["box"] ));
+    var mesh = new APOLLO.Mesh(APOLLO.Resources.Meshes["box"]);
+    mesh.texture = APOLLO.Resources.Textures["box"];
+    var newPlayer = new APOLLO.GameObject(mesh);
     newPlayer.id = data.id;
     players.push(newPlayer);
+    gameObjects.push(newPlayer);
 }
 
 function drawScene(){
@@ -113,7 +126,9 @@ function drawScene(){
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-
+    APOLLO.gl.activeTexture(gl.TEXTURE0);
+    APOLLO.gl.uniform1i(gl.getUniformLocation(shaderProgram, "sampler"), 0);
+    
     /*object.mesh.SetBuffers();
     setUniformMatrices(object, APOLLO.mainCamera);
     gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
@@ -122,11 +137,12 @@ function drawScene(){
     setUniformMatrices(object2, APOLLO.mainCamera);
     gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);*/
     
-    for (var i = 0; l = players.length, i < l; i++){
-        players[i].transform.UpdateMatrix();
-        players[i].mesh.SetBuffers();
-        setUniformMatrices(players[i], APOLLO.mainCamera);
-        gl.drawArrays(gl.TRIANGLES, 0, players[i].mesh.vertexCount); 
+    for (var i = 0; l = gameObjects.length, i < l; i++){
+        gameObjects[i].transform.UpdateMatrix();
+        gameObjects[i].mesh.SetBuffers();
+        APOLLO.gl.bindTexture(gl.TEXTURE_2D, gameObjects[i].mesh.texture);
+        setUniformMatrices(gameObjects[i], APOLLO.mainCamera);
+        gl.drawArrays(gl.TRIANGLES, 0, gameObjects[i].mesh.vertexCount); 
     }
         
 }
