@@ -1,29 +1,22 @@
 var gl;
 var object;
 var shaderProgram;
-var vertexBuffer;
-var indexBuffer;
-var worldMatrix = mat4.create();
-var viewMatrix = mat4.create();
-var perspectiveMatrix = mat4.create();
 
 var APOLLO = {};
 var socket;
 var players = [];
-var gameObjects = [];
+APOLLO.gameObjects = [];
 var player;
 
-function initGraphics(){
-            
-        
-        
-    
-        var canvas = document.getElementById('canvas');
+APOLLO.init = function(){
 
-        gl = initGL();
+        gl = APOLLO.initGL();
         APOLLO.gl = gl;
-        APOLLO.Resources = { Meshes: {}, Textures: {} };
-        input = InputManager(canvas);
+        APOLLO.Resources = { 
+            Meshes: {}, 
+            Textures: {} 
+        };
+        APOLLO.input = InputManager(canvas);
         if (gl) {
             
                 gl.clearColor(0.0, 0.0, 0.0, 1.0);                      // Set clear color to black, fully opaque
@@ -42,7 +35,7 @@ function initGraphics(){
                 alert("you dun fucked up");
         }
     
-        initShaders();
+        APOLLO.initShaders();
         
         APOLLO.loaded = start;
     
@@ -73,14 +66,11 @@ function start(){
     });
     socket.on("connection info", function(data){
         console.log("connection confimed, id is " + data.id);
-        var mesh = new APOLLO.Mesh(APOLLO.Resources.Meshes["box"]);
-        mesh.texture = APOLLO.Resources.Textures["box"];
-        player = new APOLLO.GameObject(mesh);
-        player.id = data.id;
-        players.push(player);
-        gameObjects.push(player);
+        
+        player = addPlayer(data.id);
+
         for (var i = 0; i < data.users.length; i++)
-            addPlayer(data.users[i]);
+            addPlayer(data.users[i].id);
     });
     socket.on("game update", function(data){
         
@@ -93,96 +83,51 @@ function start(){
         }
     });
     
-    var mesh = new APOLLO.Mesh(APOLLO.Resources.Meshes["plane"]);
-    mesh.texture = APOLLO.Resources.Textures["grass"];
-    var ground = new APOLLO.GameObject(mesh);
+    var ground = APOLLO.createGameObject("plane", "grass");
     ground.transform.Scale(20, 20, 20);
-    gameObjects.push(ground);
 
     APOLLO.mainCamera = new APOLLO.Camera(Math.PI/3.5, canvas.width/canvas.height, 1, 100);
     APOLLO.mainCamera.update();
     APOLLO.mainCamera.lookAt({ x: 0, y: 0, z: 0 });
 
-    drawScene();
-    setInterval(update, 15);
+    APOLLO.drawScene();
+    setInterval(APOLLO.internalUpdate, 15);
 }
 
-function addPlayer(data){
-    var mesh = new APOLLO.Mesh(APOLLO.Resources.Meshes["box"]);
-    mesh.texture = APOLLO.Resources.Textures["box"];
-    var newPlayer = new APOLLO.GameObject(mesh);
-    newPlayer.id = data.id;
+function addPlayer(id){
+    var newPlayer = APOLLO.createGameObject("box", "box");
+    newPlayer.id = id;
     players.push(newPlayer);
-    gameObjects.push(newPlayer);
+    return newPlayer;
 }
 
-function drawScene(){
+APOLLO.createGameObject = function createGameObject(mesh, texture){
+    var mesh = new APOLLO.Mesh(APOLLO.Resources.Meshes[mesh]);
+    mesh.texture = APOLLO.Resources.Textures[texture];
+    var go =  new APOLLO.GameObject(mesh);
+    APOLLO.gameObjects.push(go);
+    return go;
+}
+
+APOLLO.drawScene = function drawScene(){
 
     requestAnimationFrame(drawScene);
     APOLLO.mainCamera.update();
     //object.transform.UpdateMatrix();
     //object2.transform.UpdateMatrix();
-    
-    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    if (APOLLO.draw)
+        APOLLO.draw();
+    else 
+        console.warn("No draw function provided.");
 
-    APOLLO.gl.activeTexture(gl.TEXTURE0);
-    APOLLO.gl.uniform1i(gl.getUniformLocation(shaderProgram, "sampler"), 0);
     
-    /*object.mesh.SetBuffers();
-    setUniformMatrices(object, APOLLO.mainCamera);
-    gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-    object2.mesh.SetBuffers();
-    setUniformMatrices(object2, APOLLO.mainCamera);
-    gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);*/
-    
-    for (var i = 0; l = gameObjects.length, i < l; i++){
-        gameObjects[i].transform.UpdateMatrix();
-        gameObjects[i].mesh.SetBuffers();
-        APOLLO.gl.bindTexture(gl.TEXTURE_2D, gameObjects[i].mesh.texture);
-        setUniformMatrices(gameObjects[i], APOLLO.mainCamera);
-        gl.drawArrays(gl.TRIANGLES, 0, gameObjects[i].mesh.vertexCount); 
-    }
         
 }
 
-function update(){
+APOLLO.internalUpdate = function internalUpdate(){
     
-    var state = input.getInputState();
-
-    if (state.f){
-        APOLLO.mainCamera.follow(player);   
-    }
-    if (state.r){
-        APOLLO.mainCamera.freeRoam();   
-    }
-    if (state.space){
-        socket.emit("start game");   
-    }
-    if (state.leftArrow){
-        player.transform.RotateY(0.1);
-    }
-    if (state.rightArrow){
-        player.transform.RotateY(-0.1);
-    }
-    if (state.upArrow){
-        APOLLO.mainCamera.Move(0, 0, -1);
-    }
-    if (state.downArrow){
-        APOLLO.mainCamera.Move(0, 0, 1);
-    }
-    if (state.a){
-        player.transform.Translate(player.transform.right.x/10, player.transform.right.y/10, player.transform.right.z/10);
-    }
-    if (state.d){
-        player.transform.Translate(player.transform.right.x/-10, player.transform.right.y/-10, player.transform.right.z/-10);
-    }
-    if (state.w)
-        player.transform.Translate(player.transform.forward.x/10, player.transform.forward.y/10, player.transform.forward.z/10);
-    if (state.s)
-        player.transform.Translate(player.transform.forward.x/-10, player.transform.forward.y/-10, player.transform.forward.z/-10);
-    
+    if (APOLLO.update)
+        APOLLO.update();
     if (player){
         socket.emit("game update", {
             id: player.id,
@@ -201,7 +146,7 @@ function setUniformMatrices(obj, camera){
         
 }
 
-function initGL(){ 
+APOLLO.initGL = function initGL(){ 
 
     gl = canvas.getContext('webgl');
 
@@ -214,11 +159,11 @@ function initGL(){
             
 }
 
-function initShaders(){
+APOLLO.initShaders = function initShaders(){
             
     //create shaders
-    var vertex = getShader(gl, 'vertex-shader');
-    var fragment = getShader(gl, 'fragment-shader');
+    var vertex = APOLLO.getShader(gl, 'vertex-shader');
+    var fragment = APOLLO.getShader(gl, 'fragment-shader');
 
     //create program and link shaders
     shaderProgram = gl.createProgram();
@@ -248,7 +193,7 @@ function initShaders(){
 }
 
 
-function getShader(gl, shaderID){
+APOLLO.getShader = function getShader(gl, shaderID){
             
     var shaderScript, currentChild, source = "", shader;
 
@@ -289,6 +234,9 @@ function getShader(gl, shaderID){
     return shader;
     
 }
+
+
+//   old   -----------------------------------------------------------------
 
 function initBuffers(){
         //create buffer
