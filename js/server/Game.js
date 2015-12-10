@@ -5,6 +5,8 @@ var Game = function(){
     this.users = {};
     this.players = [];
     this.numPlayers = 0;
+    this.models = ["A", "E", "I", "O", "U"];
+    this.modelCounter = 0;
 };
 
 Game.prototype = {
@@ -16,6 +18,11 @@ Game.prototype = {
     playerConnected: function(player){
         this.players.push(new Player(player)); 
         this.numPlayers++;
+        var playerData = {
+            model: this.models[this.modelCounter++ % this.models.length]
+        };
+        console.log("Model " + playerData.model);
+        return playerData;
     },
     
     playerDisconnected: function(id){

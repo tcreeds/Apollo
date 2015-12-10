@@ -16,15 +16,16 @@ app.get('/', function(request, response){
     response.sendFile(__dirname + "/graphics.html");
 });
 
-http.listen("3000", function(){
-    console.log("server started on port 3000");
+http.listen("8000", function(){
+    console.log("server started on port 8000");
 });
 
 io.on("connection", function(socket){
     
     var user = new User(socket, ++idCounter);
-    
+    var playerData = game.playerConnected(user);
     var data = { id: user.id, users: [] }
+    
     for (var i = 0; i < users.length; i++)
         data.users.push({ id: users[i].id });
     socket.emit("connection info", data);
@@ -32,7 +33,7 @@ io.on("connection", function(socket){
     users.push(user);
     console.log("new user");
     
-    game.playerConnected(user);
+    
     
     socket.on("start game", startGame);
     socket.on("disconnect", function(){
@@ -40,7 +41,7 @@ io.on("connection", function(socket){
     });
     socket.on("game update", gameUpdate); 
     
-    socket.broadcast.emit("new user", { id: user.id });
+    socket.broadcast.emit("new user", { id: user.id, playerData: playerData });
     
     
 });

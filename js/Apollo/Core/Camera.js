@@ -100,8 +100,13 @@ APOLLO.Camera.prototype = {
             this.makeLookAt();
         }
         else{
+            //this.position = this.viewMatrix.Translation();
             //this.viewMatrix.SetTranslation(this.position.x, this.position.y, this.position.z);   
         }
+        var e = this.viewMatrix.elements;
+        this.right.Set(e[0], e[4], e[8]);
+        this.up.Set(e[1], e[5], e[9]);
+        APOLLO.Vector3.Cross(this.right, this.up, this.forward);
         
         this.makePerspective();
         //this.VPMatrix = this.makeLookTo().Clone().MultiplyMatrix4(this.makePerspective());
@@ -112,11 +117,6 @@ APOLLO.Camera.prototype = {
     },
     
     Move: function(x, y, z){
-        var e = this.viewMatrix.elements;
-        
-        this.right.Set(e[0], e[1], e[2]);
-        this.up.Set(e[4], e[5], e[6]);
-        APOLLO.Vector3.Cross(this.right, this.up, this.forward);
         this.viewMatrix.Translate(
             (this.right.x + this.up.x + this.forward.x) * x,
             (this.right.y + this.up.y + this.forward.y) * y,
@@ -124,7 +124,24 @@ APOLLO.Camera.prototype = {
     },
     
     rotate: function(x, y, z){
+        
         this.viewMatrix.Rotate(x, y, z);
+    },
+    
+    RotateAxisAngle: function(axis, angle){
+        /*this.position = this.viewMatrix.Translation;
+        this.viewMatrix.SetTranslation(0, 0, 0);
+        
+        var mat = new APOLLO.Matrix4();
+        mat.Set.apply(mat, this.viewMatrix.elements);
+        this.viewMatrix.Identity();
+        
+        this.viewMatrix.SetTranslation(this.position.x, this.position.y, this.position.z);
+        mat.RotateAxisAngle(axis, angle);  
+        this.viewMatrix.MultiplyMatrix4(mat);*/
+        this.viewMatrix.RotateAxisAngle(axis, angle);
+        //this.viewMatrix.SetTranslation(this.position.x, this.position.y, this.position.z);
+        
     },
     
     lookAt: function(target, position){

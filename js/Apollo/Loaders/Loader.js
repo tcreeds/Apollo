@@ -10,7 +10,7 @@ APOLLO.load = {
     loadComplete: function(){
         this.loadCounter --;
         if (this.loadCounter == 0)
-            APOLLO.loaded();
+            APOLLO.onload();
     },
     
     textureLoadComplete: function(texture, image, name){

@@ -14,19 +14,37 @@ function InputManager(canvas, verbose){
                 inputState: InitInputState(),
                 getInputState: getInputState,
                 subIndex: 0,
-                verbose: verbose
+                verbose: verbose,
+                mousePosition: { x: 0, y: 0 },
+                lastMousePosition: { x: 0, y: 0 }
 	};
 	canvas.addEventListener('mousedown', function(event){ im.onMouse(event, 1); });
 	canvas.addEventListener('mouseup', function(event){ im.onMouse(event, 0); });
+    canvas.addEventListener('mousemove', function(event){ im.onMouse(event, 2)});
 	window.addEventListener('keydown', function(event){ im.onKey(event, 1); });
 	window.addEventListener('keyup', function(event){ im.onKey(event, 0); });
+    canvas.addEventListener('mouseleave', function(event){
+        im.lastMousePosition = { x: undefined, y: undefined }; 
+    });
+    canvas.addEventListener('mouseenter', function(event){
+        im.lastMousePosition = { 
+            x: event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - Math.floor(im.canvas.offsetLeft),
+            y: event.clientY + document.body.scrollTop + document.documentElement.scrollTop - Math.floor(im.canvas.offsetTop) + 1
+        };
+        im.mousePosition.x = im.lastMousePosition.x;
+        im.mousePosition.y = im.lastMousePosition.y;
+    });
 	return im;
 }
 
 function onMouse(event, state){
     event = event || window.event;
+    this.lastMousePosition.x = this.mousePosition.x;
+    this.lastMousePosition.y = this.mousePosition.y;
 	var x = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - Math.floor(this.canvas.offsetLeft);
 	var y = event.clientY + document.body.scrollTop + document.documentElement.scrollTop - Math.floor(this.canvas.offsetTop) + 1;
+    this.mousePosition.x = x;
+    this.mousePosition.y = y;
     if (state == 1){
         for (var i = 0; i < this.subscribers['mousedown'].length; i++){
             this.subscribers['mousedown'][i].func.call(this.subscribers['mousedown'][i].object, event, x, y);
@@ -35,6 +53,13 @@ function onMouse(event, state){
     else if (state == 0){
         for (var i = 0; i < this.subscribers['mouseup'].length; i++){
             this.subscribers['mouseup'][i].func.call(this.subscribers['mouseup'][i].object, event, x, y);
+        }
+    }
+    else if (state == 2){
+        var movementX = this.mousePosition.x - this.lastMousePosition.x;
+        var movementY = this.mousePosition.y - this.lastMousePosition.y;
+        for (var i = 0; i < this.subscribers['mousemove'].length; i++){
+            this.subscribers['mousemove'][i].func.call(this.subscribers['mousemove'][i].object, event, movementX, movementY);
         }
     }
 }
@@ -102,6 +127,7 @@ function InputList(){
 	return {
 		mousedown: [],
 		mouseup: [],
+        mousemove: [],
 		leftArrow: [],
 		rightArrow: [],
 		upArrow: [],

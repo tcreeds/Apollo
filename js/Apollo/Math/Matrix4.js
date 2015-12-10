@@ -282,7 +282,7 @@ APOLLO.Matrix4.prototype = {
 
 }
 
-Object.defineProperties(APOLLO.Matrix4,
+Object.defineProperties(APOLLO.Matrix4.prototype,
     {
         "0 ": { get: function(){ return this.elements[0]; } },  
         "1 ": { get: function(){ return this.elements[1]; } },  
@@ -300,5 +300,10 @@ Object.defineProperties(APOLLO.Matrix4,
         "13": { get: function(){ return this.elements[13]; } },  
         "14": { get: function(){ return this.elements[14]; } },  
         "15": { get: function(){ return this.elements[15]; } },  
+        "Translation": {
+            get: function(){
+                return new APOLLO.Vector3(this.elements[12], this.elements[13], this.elements[14]);
+            }
+        }
     }
 );

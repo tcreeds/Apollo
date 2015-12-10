@@ -36,69 +36,21 @@ APOLLO.init = function(){
         }
     
         APOLLO.initShaders();
-        
-        APOLLO.loaded = start;
     
-        APOLLO.load.obj("./Box.obj", "box");
-        APOLLO.load.obj("./Plane.obj", "plane");
-        APOLLO.load.texture("./crate.jpg", "box");
-        APOLLO.load.texture("./grass.png", "grass");
+        APOLLO.load.obj("./models/Box.obj", "box");
+        APOLLO.load.obj("./models/Plane.obj", "plane");
+        APOLLO.load.obj("./models/Sphere.obj", "sphere");
+        APOLLO.load.obj("./models/A.obj", "A");
+        APOLLO.load.obj("./models/E.obj", "E");
+        APOLLO.load.obj("./models/I.obj", "I");
+        APOLLO.load.obj("./models/O.obj", "O");
+        APOLLO.load.obj("./models/U.obj", "U");
+        APOLLO.load.texture("./textures/crate.jpg", "box");
+        APOLLO.load.texture("./textures/grass.png", "grass");
+        APOLLO.load.texture("./textures/cobbles.jpg", "cobbles");
     
         
             
-}
-
-function start(){
-    
-    socket = io.connect();
-    socket.on("new user", function(data){
-        console.log("new user id: " +  data.id);
-        addPlayer(data);
-    });
-    socket.on("user disconnected", function(data){
-        console.log("user disconnected: " + data.id);
-        for (var i = 0; i < players.length; i++){
-            if (players[i].id === data.id){
-                players.splice(i, 1);
-                break;
-            }
-        }
-    });
-    socket.on("connection info", function(data){
-        console.log("connection confimed, id is " + data.id);
-        
-        player = addPlayer(data.id);
-
-        for (var i = 0; i < data.users.length; i++)
-            addPlayer(data.users[i].id);
-    });
-    socket.on("game update", function(data){
-        
-        for (var i = 0; i < data.players.length; i++){
-            for (var j = 0; j < players.length; j++){
-                if (players[j].id === data.players[i].id && players[j].id !== player.id){
-                    players[j].transform.SetPosition(data.players[i].x, data.players[i].y, data.players[i].z);
-                }
-            }
-        }
-    });
-    
-    var ground = APOLLO.createGameObject("plane", "grass");
-    ground.transform.Scale(20, 20, 20);
-
-    APOLLO.mainCamera = new APOLLO.Camera(Math.PI/3.5, canvas.width/canvas.height, 1, 100);
-    APOLLO.mainCamera.update();
-    APOLLO.mainCamera.lookAt({ x: 0, y: 0, z: 0 });
-
-    APOLLO.drawScene();
-    setInterval(APOLLO.internalUpdate, 15);
-}
-
-function addPlayer(id){
-    var newPlayer = APOLLO.createGameObject("box", "box");
-    newPlayer.id = id;
-    players.push(newPlayer);
-    return newPlayer;
 }
 
 APOLLO.createGameObject = function createGameObject(mesh, texture){
@@ -112,23 +64,19 @@ APOLLO.createGameObject = function createGameObject(mesh, texture){
 APOLLO.drawScene = function drawScene(){
 
     requestAnimationFrame(drawScene);
-    APOLLO.mainCamera.update();
-    //object.transform.UpdateMatrix();
-    //object2.transform.UpdateMatrix();
+    
+
     if (APOLLO.draw)
         APOLLO.draw();
     else 
         console.warn("No draw function provided.");
-
-    
-        
 }
 
 APOLLO.internalUpdate = function internalUpdate(){
-    
+    APOLLO.mainCamera.update();
     if (APOLLO.update)
         APOLLO.update();
-    if (player){
+    if (player && socket){
         socket.emit("game update", {
             id: player.id,
             x: player.transform.position.x,
