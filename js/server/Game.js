@@ -21,6 +21,7 @@ Game.prototype = {
         var playerData = {
             model: this.models[this.modelCounter++ % this.models.length]
         };
+        this.players[this.players.length-1].model = playerData.model;
         console.log("Model " + playerData.model);
         return playerData;
     },

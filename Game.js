@@ -14,14 +14,6 @@ function draw(){
 
     APOLLO.gl.activeTexture(APOLLO.gl.TEXTURE0);
     APOLLO.gl.uniform1i(APOLLO.gl.getUniformLocation(shaderProgram, "sampler"), 0);
-    //APOLLO.setUniform("sampler", 0);
-    /*object.mesh.SetBuffers();
-    setUniformMatrices(object, APOLLO.mainCamera);
-    gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-    object2.mesh.SetBuffers();
-    setUniformMatrices(object2, APOLLO.mainCamera);
-    gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);*/
     
     for (var i = 0; l = APOLLO.gameObjects.length, i < l; i++){
         APOLLO.gameObjects[i].transform.UpdateMatrix();
@@ -130,10 +122,10 @@ function start(){
         socket.on("connection info", function(data){
             console.log("connection confimed, id is " + data.id);
 
-            player = addPlayer(data.id, "sphere");
+            player = addPlayer(data.id, data.model || "box");
 
             for (var i = 0; i < data.users.length; i++)
-                addPlayer(data.users[i].id);
+                addPlayer(data.users[i].id, data.users[i].model);
         });
         socket.on("game update", function(data){
 

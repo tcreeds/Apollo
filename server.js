@@ -25,16 +25,23 @@ io.on("connection", connection);
 function connection(socket){    
     var user = new User(socket, ++idCounter);
     var playerData = game.playerConnected(user);
-    var data = { id: user.id, users: [] }
+    var data = { 
+        id: user.id, 
+        users: [], 
+        model: playerData.model
+    };
     
-    for (var i = 0; i < users.length; i++)
-        data.users.push({ id: users[i].id });
+    for (var i = 0; i < users.length; i++){
+        data.users.push({ 
+            id: users[i].id, 
+            model: users[i].model 
+        });
+    }
+    console.log(data);
+    
     socket.emit("connection info", data);
-    
+    socket.broadcast.emit("new user", { id: user.id, playerData: playerData });
     users.push(user);
-    console.log("new user");
-    
-    
     
     socket.on("start game", startGame);
     socket.on("disconnect", function(){
@@ -42,8 +49,8 @@ function connection(socket){
     });
     socket.on("game update", gameUpdate); 
     
-    socket.broadcast.emit("new user", { id: user.id, playerData: playerData });
     
+    console.log("new user");
     
 };
 
@@ -56,11 +63,10 @@ function userDisconnected(user){
         if (users[i] == user){
             users.splice(i, 1);
             i--;
-        }
-        else {
-            users[i].socket.emit("user disconnected", { id: id });   
+            break;
         }
     }
+    io.emit("user disconnected", { id: id });   
 };
 
 function startGame(){
