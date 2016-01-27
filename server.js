@@ -16,12 +16,13 @@ app.get('/', function(request, response){
     response.sendFile(__dirname + "/graphics.html");
 });
 
-http.listen("8000", function(){
-    console.log("server started on port 8000");
+http.listen("443", function(){
+    console.log("server started on port 443");
 });
 
-io.on("connection", function(socket){
-    
+
+io.on("connection", connection);
+function connection(socket){    
     var user = new User(socket, ++idCounter);
     var playerData = game.playerConnected(user);
     var data = { id: user.id, users: [] }
@@ -44,7 +45,7 @@ io.on("connection", function(socket){
     socket.broadcast.emit("new user", { id: user.id, playerData: playerData });
     
     
-});
+};
 
 function userDisconnected(user){
     console.log("user disconnected");

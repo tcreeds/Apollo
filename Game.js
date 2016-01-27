@@ -109,12 +109,14 @@ function addPlayer(id, mesh, texture){
 }
 
 function start(){
-    
     try {
-        socket = io.connect();
+        var serverLocation = window.location.href;
+        var wsServer = serverLocation.replace("http", "ws");
+        socket = io.connect(wsServer);
+        
         socket.on("new user", function(data){
             console.log("new user id: " +  data.id);
-            addPlayer(data.id, data.playerData);
+            addPlayer(data.id, data.playerData.model, data.playerData.texture);
         });
         socket.on("user disconnected", function(data){
             console.log("user disconnected: " + data.id);
