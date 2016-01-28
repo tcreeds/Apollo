@@ -95,6 +95,11 @@ function start(){
     try {
         var serverLocation = window.location.href;
         var wsServer = serverLocation.replace("http", "ws");
+        
+        if (wsServer.indexOf("443") === -1){
+            wsServer.replace(".com", ".com:443");
+        }
+        
         socket = io.connect(wsServer);
         
         socket.on("new user", function(data){
