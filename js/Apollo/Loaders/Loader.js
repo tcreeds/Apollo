@@ -103,11 +103,7 @@ APOLLO.load = {
                 
             }
         }
-        
-        console.log("number of vertices " + (vertexCount));
-        console.log(vPositions);
-        console.log(vNormals);
-        console.log(vUvs);
+
         var vertexData = {
             positions: vPositions,
             vertexCount: vertexCount,

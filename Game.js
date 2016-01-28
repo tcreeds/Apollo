@@ -97,7 +97,7 @@ function start(){
         var wsServer = serverLocation.replace("http", "ws");
         
         if (wsServer.indexOf("443") === -1){
-            wsServer.replace(".com", ".com:443");
+            wsServer = wsServer.replace(".com", ".com:443");
         }
         
         socket = io.connect(wsServer);

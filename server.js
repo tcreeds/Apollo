@@ -4,6 +4,7 @@ var express = require("express"),
     io = require("socket.io")(http),
     User = require("./js/server/User.js"),
     Game = require("./js/server/Game.js"),
+    nsp = io.of("/apollo"),
     gameLoop;
 ;
 
@@ -22,7 +23,7 @@ http.listen("443", function(){
 });
 
 
-io.on("connection", connection);
+nsp.on("connection", connection);
 function connection(socket){    
     var user = new User(socket, ++idCounter);
     var playerData = game.playerConnected(user);
