@@ -3,7 +3,8 @@ var express = require("express"),
     http = require("http").Server(app),
     io = require("socket.io")(http),
     User = require("./js/server/User.js"),
-    Game = require("./js/server/Game.js")
+    Game = require("./js/server/Game.js"),
+    gameLoop;
 ;
 
 var idCounter = 0;
@@ -32,30 +33,21 @@ function connection(socket){
     };
     
     for (var i = 0; i < users.length; i++){
-        data.users.push({ 
-            id: users[i].id, 
-            model: users[i].model 
-        });
+        data.users.push(game.getPlayerData(users[i].id));
     }
-    console.log(data);
     
     socket.emit("connection info", data);
     socket.broadcast.emit("new user", { id: user.id, playerData: playerData });
     users.push(user);
     
-    socket.on("start game", startGame);
     socket.on("disconnect", function(){
         userDisconnected(user);
     });
     socket.on("game update", gameUpdate); 
-    
-    
-    console.log("new user");
-    
+    startGame();
 };
 
 function userDisconnected(user){
-    console.log("user disconnected");
     var id = user.id;
     game.playerDisconnected(user.id);
     
@@ -66,6 +58,9 @@ function userDisconnected(user){
             break;
         }
     }
+    if (users.length === 0){
+        stopGame();   
+    }
     io.emit("user disconnected", { id: id });   
 };
 
@@ -73,10 +68,15 @@ function startGame(){
     if (!game.running){
         console.log("game started");
         game.start();
-        setInterval(updateClients, 30);
+        gameLoop = setInterval(updateClients, 30);
         io.emit("game started");
     }
 };
+
+function stopGame(){
+    game.running = false;
+    clearInterval(gameLoop);
+}
 
 function updateClients(){
     

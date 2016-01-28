@@ -80,15 +80,6 @@ function update(){
             APOLLO.mainCamera.RotateAxisAngle(APOLLO.Vector3.Up, -0.01);//viewMatrix.RotateY(-0.01);   
         }
     }
-    
-    
-    if (state.space){
-        socket.emit("start game");   
-    }
-    
-   
-    
-    
 }
 
 function addPlayer(id, mesh, texture){
@@ -120,9 +111,9 @@ function start(){
             }
         });
         socket.on("connection info", function(data){
-            console.log("connection confimed, id is " + data.id);
-
+            console.log("connection confimed, id is " + data.id);   
             player = addPlayer(data.id, data.model || "box");
+            APOLLO.mainCamera.follow(player);
 
             for (var i = 0; i < data.users.length; i++)
                 addPlayer(data.users[i].id, data.users[i].model);

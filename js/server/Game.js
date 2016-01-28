@@ -15,14 +15,14 @@ Game.prototype = {
         this.running = true;   
     },
     
-    playerConnected: function(player){
-        this.players.push(new Player(player)); 
+    playerConnected: function(user){
+        var player = new Player(user);
+        player.model = this.models[this.modelCounter++ % this.models.length];
+        this.players.push(player); 
         this.numPlayers++;
         var playerData = {
-            model: this.models[this.modelCounter++ % this.models.length]
+            model: player.model
         };
-        this.players[this.players.length-1].model = playerData.model;
-        console.log("Model " + playerData.model);
         return playerData;
     },
     
@@ -65,6 +65,16 @@ Game.prototype = {
             }
         }
         
+    },
+    
+    getPlayerData: function(id){
+        for (var i = 0; i < this.players.length; i++){
+            if (this.players[i].id == id)
+                return {
+                    id: id,
+                    model: this.players[i].model
+                };
+        }
     }
     
 };
