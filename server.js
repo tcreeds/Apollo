@@ -4,7 +4,8 @@ var express = require("express"),
     io = require("socket.io")(http),
     User = require("./js/server/User.js"),
     Game = require("./js/server/Game.js"),
-    nsp = io.of("/apollo"),
+    nsp = io.of("/apollo/"), //server version
+    //nsp = io,  //local version
     gameLoop;
 ;
 
@@ -62,7 +63,7 @@ function userDisconnected(user){
     if (users.length === 0){
         stopGame();   
     }
-    io.emit("user disconnected", { id: id });   
+    nsp.emit("user disconnected", { id: id });   
 };
 
 function startGame(){
@@ -70,7 +71,7 @@ function startGame(){
         console.log("game started");
         game.start();
         gameLoop = setInterval(updateClients, 30);
-        io.emit("game started");
+        nsp.emit("game started");
     }
 };
 
@@ -83,7 +84,7 @@ function updateClients(){
     
     var gameData = game.sendUpdate();
     
-    io.emit("game update", gameData);
+    nsp.emit("game update", gameData);
     
     
 };
