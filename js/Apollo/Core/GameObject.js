@@ -13,21 +13,29 @@ APOLLO.GameObject.prototype = {
 
         Update: function(){
         
-                this.transform.Update();
-            
-                /*this.velocity.x += this.appliedForce.x * this.inverseMass;
-                this.velocity.y += this.appliedForce.y * this.inverseMass;
-                this.velocity.z += this.appliedForce.z * this.inverseMass;
+            this.transform.Update();
 
-                this.position.x += this.velocity.x;
-                this.position.y += this.velocity.y;
-                this.position.z += this.velocity.z;*/
+            /*this.velocity.x += this.appliedForce.x * this.inverseMass;
+            this.velocity.y += this.appliedForce.y * this.inverseMass;
+            this.velocity.z += this.appliedForce.z * this.inverseMass;
 
-                //this.mesh.rotateOnAxis(this.rotationAxis, this.rotationAxis.lengthManhattan() / 100);
+            this.position.x += this.velocity.x;
+            this.position.y += this.velocity.y;
+            this.position.z += this.velocity.z;*/
+
+            //this.mesh.rotateOnAxis(this.rotationAxis, this.rotationAxis.lengthManhattan() / 100);
 
 
-                this.appliedForce.x = this.appliedForce.y = this.appliedForce.z = 0;
+            this.appliedForce.x = this.appliedForce.y = this.appliedForce.z = 0;
                 
+        },
+    
+        Destroy: function(){
+               
+            APOLLO.gameObjects.splice(APOLLO.gameObjects.indexOf(this), 1);
+            delete this.transform;
+            delete this;
+            
         }
         
         

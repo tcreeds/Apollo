@@ -4,9 +4,9 @@ var express = require("express"),
     io = require("socket.io")(http),
     User = require("./js/server/User.js"),
     Game = require("./js/server/Game.js"),
-    nsp = io.of("/apollo/"), //server version
-    //nsp = io,  //local version
-    gameLoop;
+    nsp = io.of("/apollo/"),
+    gameLoop,
+    local = false;  //change this value if not on server - i.e. localhost
 ;
 
 var idCounter = 0;
@@ -23,8 +23,11 @@ http.listen("443", function(){
     console.log("server started on port 443");
 });
 
+if (local)
+    io.on("connection", connection);
+else
+    nsp.on("connection", connection);
 
-nsp.on("connection", connection);
 function connection(socket){    
     var user = new User(socket, ++idCounter);
     var playerData = game.playerConnected(user);
@@ -63,7 +66,7 @@ function userDisconnected(user){
     if (users.length === 0){
         stopGame();   
     }
-    nsp.emit("user disconnected", { id: id });   
+    sendMessage("user disconnected", { id: id });   
 };
 
 function startGame(){
@@ -71,7 +74,7 @@ function startGame(){
         console.log("game started");
         game.start();
         gameLoop = setInterval(updateClients, 30);
-        nsp.emit("game started");
+        sendMessage("game started");
     }
 };
 
@@ -85,7 +88,7 @@ function updateClients(){
     
     var gameData = game.sendUpdate();
     
-    nsp.emit("game update", gameData);
+    sendMessage("game update", gameData);
     
     
 };
@@ -94,4 +97,11 @@ function gameUpdate(data){
     game.receiveUpdate(data);  
 };
 
-
+function sendMessage(message, data){
+    if (local){
+        io.emit(message, data);   
+    }
+    else{
+        nsp.emit(message, data);
+    }
+}

@@ -12,7 +12,8 @@ var Player = function(data){
     
 };
 
-Player.prototype = {
+Player.prototype.destroy = function(){
+    
     
     
 };

@@ -102,38 +102,10 @@ function start(){
         
         socket = io.connect(wsServer);
         
-        socket.on("new user", function(data){
-            console.log("new user id: " +  data.id);
-            addPlayer(data.id, data.playerData.model, data.playerData.texture);
-        });
-        socket.on("user disconnected", function(data){
-            console.log("user disconnected: " + data.id);
-            for (var i = 0; i < players.length; i++){
-                if (players[i].id === data.id){
-                    players.splice(i, 1);
-                    break;
-                }
-            }
-        });
-        socket.on("connection info", function(data){
-            console.log("connection confimed, id is " + data.id);   
-            player = addPlayer(data.id, data.model || "box");
-            APOLLO.mainCamera.follow(player);
-
-            for (var i = 0; i < data.users.length; i++)
-                addPlayer(data.users[i].id, data.users[i].model);
-        });
-        socket.on("game update", function(data){
-
-            for (var i = 0; i < data.players.length; i++){
-                for (var j = 0; j < players.length; j++){
-                    if (players[j].id === data.players[i].id && players[j].id !== player.id){
-                        players[j].transform.SetPosition(data.players[i].position);
-                        players[j].transform.rotationMatrix = players[j].transform.rotationMatrix.Identity().RotateY(data.players[i].rotation);
-                    }
-                }
-            }
-        });
+        socket.on("new user", newUser);
+        socket.on("user disconnected", userDisconnected);
+        socket.on("connection info", connectionInfo);
+        socket.on("game update", gameUpdate);
     }
     catch(e){
         player = addPlayer(1, "sphere");
@@ -151,6 +123,50 @@ function start(){
 
     APOLLO.drawScene();
     setInterval(APOLLO.internalUpdate, 15);
+}
+
+
+function newUser(data){
+    console.log("new user id: " +  data.id);
+    addPlayer(data.id, data.playerData.model, data.playerData.texture);
+}
+
+
+function userDisconnected(data){
+    
+    console.log("user disconnected: " + data.id);
+    for (var i = 0; i < players.length; i++){
+        if (players[i].id === data.id){
+            players[i].Destroy();
+            players.splice(i, 1);
+            break;
+        }
+    }
+}
+
+
+function connectionInfo(data){
+    
+    console.log("connection confimed, id is " + data.id); 
+    
+    player = addPlayer(data.id, data.model || "box");
+    APOLLO.mainCamera.follow(player);
+
+    for (var i = 0; i < data.users.length; i++)
+        addPlayer(data.users[i].id, data.users[i].model);
+}
+
+
+function gameUpdate(data){
+    
+    for (var i = 0; i < data.players.length; i++){
+        for (var j = 0; j < players.length; j++){
+            if (players[j].id === data.players[i].id && players[j].id !== player.id){
+                players[j].transform.SetPosition(data.players[i].position);
+                players[j].transform.rotationMatrix = players[j].transform.rotationMatrix.Identity().RotateY(data.players[i].rotation);
+            }
+        }
+    }
 }
 
 function moveCamera(event, x, y){
