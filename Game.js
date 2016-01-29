@@ -128,7 +128,8 @@ function start(){
             for (var i = 0; i < data.players.length; i++){
                 for (var j = 0; j < players.length; j++){
                     if (players[j].id === data.players[i].id && players[j].id !== player.id){
-                        players[j].transform.SetPosition(data.players[i].x, data.players[i].y, data.players[i].z);
+                        players[j].transform.SetPosition(data.players[i].position);
+                        players[j].transform.rotationMatrix = players[j].transform.rotationMatrix.Identity().RotateY(data.players[i].rotation);
                     }
                 }
             }

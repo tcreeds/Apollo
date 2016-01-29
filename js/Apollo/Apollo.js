@@ -76,13 +76,13 @@ APOLLO.internalUpdate = function internalUpdate(){
     APOLLO.mainCamera.update();
     if (APOLLO.update)
         APOLLO.update();
-    if (player && socket){
-        socket.emit("game update", {
+    if (player && socket){      
+        var d = {
             id: player.id,
-            x: player.transform.position.x,
-            y: player.transform.position.y,
-            z: player.transform.position.z
-        });
+            position: player.transform.position,
+            rotation: -Math.atan2(player.transform.rotationMatrix.elements[2], player.transform.rotationMatrix.elements[0])
+        }
+        socket.emit("game update", d);
     }
 }
 

@@ -76,6 +76,7 @@ function startGame(){
 };
 
 function stopGame(){
+    console.log("game stopped");
     game.running = false;
     clearInterval(gameLoop);
 }

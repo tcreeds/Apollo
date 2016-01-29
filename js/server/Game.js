@@ -44,10 +44,8 @@ Game.prototype = {
         for (var i = 0; i < this.players.length; i++){
             var obj = {
                 id: this.players[i].id,
-                x: this.players[i].x,
-                y: this.players[i].y,
-                z: this.players[i].z
-
+                position: this.players[i].position,
+                rotation: this.players[i].rotation
             }
             data.players.push(obj);
             
@@ -58,9 +56,8 @@ Game.prototype = {
     receiveUpdate: function(data){
        for (var i = 0; i < this.players.length; i++){
             if (this.players[i].id === data.id){
-                this.players[i].x = data.x;
-                this.players[i].y = data.y;
-                this.players[i].z = data.z;
+                this.players[i].position = data.position;
+                this.players[i].rotation = data.rotation;
                 break;
             }
         }
