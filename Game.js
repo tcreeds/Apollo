@@ -92,24 +92,22 @@ function addPlayer(id, mesh, texture){
 }
 
 function start(){
-    try {
-        var serverLocation = window.location.href;
-        var wsServer = serverLocation.replace("http", "ws");
-        
-        if (wsServer.indexOf("443") === -1){
-            wsServer = wsServer.replace(".com", ".com:443");
-        }
-        
-        socket = io.connect(wsServer);
-        
-        socket.on("new user", newUser);
-        socket.on("user disconnected", userDisconnected);
-        socket.on("connection info", connectionInfo);
-        socket.on("game update", gameUpdate);
+    var serverLocation = window.location.href;
+    var wsServer = serverLocation.replace("http", "ws");
+
+    if (wsServer.indexOf("443") === -1){
+        wsServer = wsServer.replace(".com", ".com:443");
     }
-    catch(e){
-        player = addPlayer(1, "sphere");
-    }
+
+    socket = io.connect(wsServer);
+
+    socket.on("new user", newUser);
+    socket.on("user disconnected", userDisconnected);
+    socket.on("connection info", connectionInfo);
+    socket.on("game update", gameUpdate);
+    
+    socket.on("connect_error", connectError);
+    
     
     //APOLLO.input.subscribe("mousemove", moveCamera);
     
@@ -125,6 +123,11 @@ function start(){
     setInterval(APOLLO.internalUpdate, 15);
 }
 
+function connectError(){
+    if (player === undefined || player === null){
+        player = addPlayer(1);   
+    }
+}
 
 function newUser(data){
     console.log("new user id: " +  data.id);
