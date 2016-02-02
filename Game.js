@@ -125,7 +125,8 @@ function start(){
 
 function connectError(){
     if (player === undefined || player === null){
-        player = addPlayer(1);   
+        player = addPlayer(1);
+        document.getElementById(output).innerHTML = "Game server is not running, you are offline.";
     }
 }
 
@@ -151,6 +152,7 @@ function userDisconnected(data){
 function connectionInfo(data){
     
     console.log("connection confimed, id is " + data.id); 
+    document.getElementById(output).innerHTML = "Connected to game server.";
     
     player = addPlayer(data.id, data.model || "box");
     APOLLO.mainCamera.follow(player);
