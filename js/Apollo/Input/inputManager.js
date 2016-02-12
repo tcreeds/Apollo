@@ -65,36 +65,38 @@ function onMouse(event, state){
 }
 
 function onKey(event, state){
-    if (this.verbose)
-        console.log( event.which );
-    switch(event.which){
-        case 32: this.inputState.space = state;
-            break;
-        case 37: this.inputState.leftArrow = state;
-            break;
-        case 38: this.inputState.upArrow = state;
-            break;
-        case 39: this.inputState.rightArrow = state;
-            break;
-        case 40: this.inputState.downArrow = state;
-            break;
-        case 65: this.inputState.a = state;
-            break;
-        case 68: this.inputState.d = state;
-            break;
-        case 69: this.inputState.e = state;
-            break;
-        case 70: this.inputState.f = state;
-            break;
-        case 87: this.inputState.w = state;
-            break;
-        case 83: this.inputState.s = state;
-            break;
-        case 81: this.inputState.q = state;
-            break;
-        case 69: this.inputState.e = state;
-            break;
-        case 82: this.inputState.r = state;
+    if (!$("*:focus").is("input")){
+        if (this.verbose)
+            console.log( event.which );
+        switch(event.which){
+            case 32: this.inputState.space = state;
+                break;
+            case 37: this.inputState.leftArrow = state;
+                break;
+            case 38: this.inputState.upArrow = state;
+                break;
+            case 39: this.inputState.rightArrow = state;
+                break;
+            case 40: this.inputState.downArrow = state;
+                break;
+            case 65: this.inputState.a = state;
+                break;
+            case 68: this.inputState.d = state;
+                break;
+            case 69: this.inputState.e = state;
+                break;
+            case 70: this.inputState.f = state;
+                break;
+            case 87: this.inputState.w = state;
+                break;
+            case 83: this.inputState.s = state;
+                break;
+            case 81: this.inputState.q = state;
+                break;
+            case 69: this.inputState.e = state;
+                break;
+            case 82: this.inputState.r = state;
+        }
     }
 }
 

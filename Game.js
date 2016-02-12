@@ -105,6 +105,7 @@ function start(){
     socket.on("user disconnected", userDisconnected);
     socket.on("connection info", connectionInfo);
     socket.on("game update", gameUpdate);
+    socket.on("chat message", handleChat);
     
     socket.on("connect_error", connectError);
     
@@ -121,6 +122,30 @@ function start(){
 
     APOLLO.drawScene();
     setInterval(APOLLO.internalUpdate, 15);
+}
+
+function handleChat(data){
+    var el = $("<p></p>");
+    el.text("User " + data.name + ": " + data.text);
+    el.addClass("chatMessage");
+    el.attr("timestamp", data.timestamp);
+    $.each($(".chatMessage"), function( index, value ){
+        var obj = $(value);
+        if (obj.attr("timestamp") > data.timestamp){
+            obj.before(el);
+            return false;
+        }
+    });
+    $("#output").append(el);
+}
+
+function sendMessage(){
+    if (player.id === undefined)
+        return;
+    var text = $("#chatInput").val();
+    $("#chatInput").val("");
+    if (text != "")
+        socket.emit("chat message", { text: text, id: player.id });
 }
 
 function connectError(){
@@ -151,8 +176,8 @@ function userDisconnected(data){
 
 function connectionInfo(data){
     
-    console.log("connection confimed, id is " + data.id); 
-    document.getElementById("output").innerHTML = "Connected to game server.";
+    console.log("connection confimed, id is " + data.id);
+    $("#output").append($("<p class='chatMessage'>Connected to game server.</p>"));
     
     player = addPlayer(data.id, data.model || "box");
     APOLLO.mainCamera.follow(player);

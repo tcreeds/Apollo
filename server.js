@@ -49,6 +49,7 @@ function connection(socket){
         userDisconnected(user);
     });
     socket.on("game update", gameUpdate); 
+    socket.on("chat message", handleChat);
     startGame();
 };
 
@@ -89,9 +90,16 @@ function updateClients(){
     var gameData = game.sendUpdate();
     
     sendMessage("game update", gameData);
-    
-    
 };
+
+function handleChat(data){
+     
+    sendMessage("chat message", {
+        text: data.text,
+        name: data.id,
+        timestamp: Date.now()
+    });
+}
 
 function gameUpdate(data){
     game.receiveUpdate(data);  

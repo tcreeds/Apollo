@@ -63,9 +63,25 @@
     </script>
     
     <style>
+        * {
+            box-sizing: border-box;   
+        }
         html, body{
             padding: 0;
             margin: 0;
+        }
+        #output {
+            height: 300px;
+            width: calc(100% - 10px);
+            max-width: 790px;
+            border: 1px solid grey;
+            margin: 5px;
+        }
+        #chatInput {
+            margin: 5px;   
+        }
+        p {
+            margin: 3px;   
         }
     </style>
 </head>
@@ -73,10 +89,9 @@
     <div>
         <canvas id="canvas" width="800" height="500">
     </div>
-    <div id="output">
-    </div>
-    <div id="output2">
+    <input type=text id="chatInput">
+    <input type=button onclick="sendMessage()" value="SEND">
+    <div id="output"></div>
     
-    </div>
 </body>
 </html>
