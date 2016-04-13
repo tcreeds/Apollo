@@ -151,7 +151,7 @@ function sendMessage(){
 function connectError(){
     if (player === undefined || player === null){
         player = addPlayer(1);
-        document.getElementById("output").innerHTML = "Game server is not running, you are offline.";
+        document.getElementById("output").innerHTML = "<p class='chatMessage'>Game server is not running, you are offline.</p>";
     }
 }
 

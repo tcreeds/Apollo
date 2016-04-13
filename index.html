@@ -70,15 +70,24 @@
             padding: 0;
             margin: 0;
         }
+        .textContainer{
+            position: relative;
+            top: -5px;
+            transform: translateY(-101%);   
+            -webkit-transform: translateY(-100%);   
+        }
         #output {
-            height: 300px;
+            max-height: 300px;
             width: calc(100% - 10px);
             max-width: 790px;
-            border: 1px solid grey;
             margin: 5px;
+            color: white;
+            letter-spacing: 1px;
         }
         #chatInput {
-            margin: 5px;   
+            margin: 5px; 
+            background: none;
+            color: white;
         }
         p {
             margin: 3px;   
@@ -89,9 +98,12 @@
     <div>
         <canvas id="canvas" width="800" height="500">
     </div>
-    <input type=text id="chatInput">
-    <input type=button onclick="sendMessage()" value="SEND">
-    <div id="output"></div>
+    <div class="textContainer">
+        <div id="output"></div>
+        <input type=text id="chatInput">
+        <input type=button onclick="sendMessage()" value="SEND">
+    </div>
+    
     
 </body>
 </html>

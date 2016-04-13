@@ -32,7 +32,7 @@ APOLLO.init = function(){
                 
         }
         else{
-                alert("you dun fucked up");
+                alert("Something went wrong!");
         }
     
         APOLLO.initShaders();

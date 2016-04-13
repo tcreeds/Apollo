@@ -6,7 +6,7 @@ var express = require("express"),
     Game = require("./js/server/Game.js"),
     nsp = io.of("/apollo/"),
     gameLoop,
-    local = false;  //change this value if not on server - i.e. localhost
+    local = true;  //change this value if not on server - i.e. localhost
 ;
 
 var idCounter = 0;
